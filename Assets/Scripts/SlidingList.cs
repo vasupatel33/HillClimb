@@ -18,6 +18,8 @@ public class SlidingList : MonoBehaviour
     [SerializeField] AnimationCurve positionXCurve;
     [SerializeField] AnimationCurve positionYCurve;
 
+    public static SlidingList instance;
+
     int workingAnimationCoroutines = 0;
 
     int centerOptionIndex;
@@ -25,6 +27,11 @@ public class SlidingList : MonoBehaviour
 
     Vector2 initialTouchPosition;
     [SerializeField] float minSwipeDistance = 100f;
+
+    private void Awake()
+    {
+        instance = this;
+    }
     void Start()
     {
         for (int i = 0; i < options.Count; i++)
@@ -35,8 +42,8 @@ public class SlidingList : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("Touch count: " + Input.touchCount);
 
+        Debug.Log("Center Index = "+centerOptionIndex);
         for (int i = 0; i < Input.touchCount; i++)
         {
             Debug.Log("11");
@@ -56,27 +63,49 @@ public class SlidingList : MonoBehaviour
                 break;
             }
         }
-    }
 
+    } 
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Triggered");
+    }
     public void SlideLeft()
 	{
-        centerOptionIndex++;
-        foreach (var option in options)
-		{
-            int index = optionIndex[option]--; // save old index and decrease
-            int newIndex = index - 1;
-            StartCoroutine(AnimateSlide(option, index, newIndex));
+            centerOptionIndex++;
+        if (centerOptionIndex < options.Count)
+        {
+            Debug.Log("Right index = " + centerOptionIndex);
+            foreach (var option in options)
+            {
+                int index = optionIndex[option]--; // save old index and decrease
+                int newIndex = index - 1;
+                Debug.Log("new index = " + newIndex + "index = " + index);
+                StartCoroutine(AnimateSlide(option, index, newIndex));
+            }
+        }
+        else
+        {
+            centerOptionIndex--;
         }
 	}
 
     public void SlideRight()
 	{
-        centerOptionIndex--;
-        foreach (var option in options)
+            centerOptionIndex--;
+        if (centerOptionIndex >= 0)
         {
-            int index = optionIndex[option]++; // save old index and increase
-            int newIndex = index + 1;
-            StartCoroutine(AnimateSlide(option, index, newIndex));
+            Debug.Log("Right index = " + centerOptionIndex);
+            foreach (var option in options)
+            {
+                int index = optionIndex[option]++; // save old index and increase
+                int newIndex = index + 1;
+                StartCoroutine(AnimateSlide(option, index, newIndex));
+                Debug.Log("new index = " + newIndex + "index = " + index);
+            }
+        }
+        else
+        {
+            centerOptionIndex++;
         }
     }
 
